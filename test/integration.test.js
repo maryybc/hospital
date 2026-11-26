@@ -73,43 +73,72 @@ function dataFutura(dias) {
     return new Date(Date.now() + dias * 86400000).toISOString().slice(0, 10);
 }
 
-test("atalho Ctrl+Alt+A navega ao painel admin a partir dos módulos", () => {
+test("atalho Ctrl+Alt+A abre o painel somente para administrador autenticado", () => {
     const codigoAtalho = fs.readFileSync(
         path.join(__dirname, "../frontend/admin-shortcut.js"), "utf8");
-    let manipuladorTeclado;
-    let destino;
-    let prevenido = false;
-    const janela = {
-        location: {
-            pathname: "/medico.html",
-            assign(url) {
-                destino = url;
+
+    function executarAtalho({ token, usuario }) {
+        let manipuladorTeclado;
+        let destino;
+        let prevenido = false;
+        const valores = {
+            hospitalar_token: token,
+            hospitalar_user: JSON.stringify(usuario)
+        };
+        const janela = {
+            location: {
+                pathname: "/medico.html",
+                assign(url) {
+                    destino = url;
+                }
+            },
+            sessionStorage: {
+                getItem(chave) {
+                    return valores[chave] ?? null;
+                }
+            },
+            addEventListener(evento, manipulador) {
+                assert.equal(evento, "keydown");
+                manipuladorTeclado = manipulador;
             }
-        },
-        addEventListener(evento, manipulador) {
-            assert.equal(evento, "keydown");
-            manipuladorTeclado = manipulador;
-        }
-    };
+        };
 
-    vm.runInNewContext(codigoAtalho, {
-        URL,
-        document: { baseURI: "http://localhost:3000/medico.html" },
-        window: janela
-    });
+        vm.runInNewContext(codigoAtalho, {
+            URL,
+            document: { baseURI: "http://localhost:3000/medico.html" },
+            window: janela
+        });
 
-    manipuladorTeclado({
-        ctrlKey: true,
-        altKey: true,
-        code: "KeyA",
-        key: "å",
-        repeat: false,
-        preventDefault() {
-            prevenido = true;
+        if (manipuladorTeclado) {
+            manipuladorTeclado({
+                ctrlKey: true,
+                altKey: true,
+                code: "KeyA",
+                key: "å",
+                repeat: false,
+                preventDefault() {
+                    prevenido = true;
+                }
+            });
         }
+        return { destino, prevenido };
+    }
+
+    assert.deepEqual(executarAtalho({
+        token: "token-admin",
+        usuario: { tipo: "admin" }
+    }), {
+        destino: "http://localhost:3000/admin.html",
+        prevenido: true
     });
-    assert.equal(prevenido, true);
-    assert.equal(destino, "http://localhost:3000/admin.html");
+    assert.deepEqual(executarAtalho({
+        token: "token-medico",
+        usuario: { tipo: "medico" }
+    }), { destino: undefined, prevenido: false });
+    assert.deepEqual(executarAtalho({
+        token: null,
+        usuario: { tipo: "admin" }
+    }), { destino: undefined, prevenido: false });
 });
 
 test("integra estoque, prescrição e dispensação com controle de perfil", async () => {
