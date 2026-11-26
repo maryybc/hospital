@@ -1,4 +1,16 @@
 (() => {
+    let usuarioAtual = {};
+    try {
+        usuarioAtual = JSON.parse(
+            window.sessionStorage.getItem("hospitalar_user") || "{}"
+        );
+    } catch (erro) {
+        console.error("Dados da sessão inválidos:", erro);
+    }
+
+    const token = window.sessionStorage.getItem("hospitalar_token");
+    if (!token || usuarioAtual.tipo !== "admin") return;
+
     const paginaAdmin = new URL("admin.html", document.baseURI);
 
     window.addEventListener("keydown", event => {
