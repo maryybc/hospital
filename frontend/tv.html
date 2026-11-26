@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mídia Indoor - Sistema Hospitalar</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #5c4033;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.tv-container {
+  display: flex;
+  width: 95vw;
+  height: 90vh;
+  gap: 18px;
+}
+
+.left-panel,
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 18px;
+}
+
+.left-panel {
+  width: 35%;
+}
+
+.right-panel {
+  width: 65%;
+}
+
+.box {
+  background: #63d4f4;
+  border: 6px solid #b39b82;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4px 15px #0004;
+  overflow: hidden;
+}
+
+.box-title {
+  color: white;
+  font-size: clamp(16px, 2.2vw, 34px);
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 3px #0006;
+}
+
+.local-box,
+.history-box,
+.logo-box {
+  flex: 1;
+}
+
+.history-box {
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.history-box .box-title {
+  font-size: clamp(15px, 1.8vw, 25px);
+  align-self: center;
+}
+
+.local-number,
+.patient-name {
+  color: #c62828;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.local-number {
+  font-size: clamp(35px, 5vw, 75px);
+}
+
+.local-type {
+  color: #5c4033;
+  font-size: clamp(16px, 1.8vw, 26px);
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+#history-list {
+  list-style: none;
+  width: 100%;
+  color: #8b1a1a;
+  font-size: clamp(13px, 1.5vw, 22px);
+  font-weight: bold;
+  text-align: left;
+}
+
+#history-list li {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #0003;
+  overflow-wrap: anywhere;
+}
+
+.patient-box {
+  flex: 3;
+}
+
+.patient-name {
+  font-size: clamp(30px, 6.5vw, 90px);
+  line-height: 1.2;
+}
+
+.patient-message {
+  color: #5c4033;
+  font-size: clamp(16px, 2.2vw, 30px);
+  font-weight: bold;
+  line-height: 1.4;
+  margin-top: 25px;
+}
+
+.logo-text {
+  color: #8b245e;
+  font-size: clamp(20px, 3.5vw, 45px);
+  font-weight: bold;
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .45; transform: scale(.98); }
+}
+
+.flash {
+  animation: flash .5s ease 3;
+}
+
+@media (max-width: 600px) {
+  .tv-container {
+    width: 96vw;
+    height: 94vh;
+    gap: 8px;
+  }
+
+  .left-panel {
+    width: 36%;
+    gap: 8px;
+  }
+
+  .right-panel {
+    width: 64%;
+    gap: 8px;
+  }
+
+  .box {
+    padding: 8px;
+    border-width: 3px;
+    border-radius: 9px;
+  }
+
+  .patient-message {
+    margin-top: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="tv-container">
+
+  <section class="left-panel">
+    <div class="box local-box">
+      <div class="box-title">LOCAL DE CHAMADA</div>
+      <div class="local-number" id="local-numero">--</div>
+      <div class="local-type" id="local-tipo">AGUARDANDO CHAMADA</div>
+    </div>
+
+    <div class="box history-box">
+      <div class="box-title">ÚLTIMAS CHAMADAS</div>
+      <ul id="history-list">
+        <li>Nenhuma chamada ainda</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="right-panel">
+    <div class="box patient-box" id="patient-box">
+      <div class="box-title">🏥 PACIENTE CHAMADO</div>
+      <div class="patient-name" id="patient-nome">AGUARDANDO...</div>
+      <div class="patient-message" id="patient-message">
+        Aguarde sua chamada.
+      </div>
+    </div>
+
+    <div class="box logo-box">
+      <div class="logo-text">🏥 Sistema Hospitalar</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const API = window.location.origin;
+
+let ultimaChamadaId = null;
+let historico = [];
+
+async function atualizar() {
+  try {
+    const resposta = await fetch(`${API}/chamada-tv`, {
+      cache: "no-store"
+    });
+
+    if (!resposta.ok) {
+      throw new Error(`Erro HTTP ${resposta.status}`);
+    }
+
+    const dados = await resposta.json();
+    const chamada = dados.chamadaTV ?? dados.chamada ?? dados;
+
+    if (!chamada || !chamada.nome) {
+      document.getElementById("patient-nome").textContent =
+        "AGUARDANDO...";
+      document.getElementById("local-numero").textContent = "--";
+      document.getElementById("local-tipo").textContent =
+        "AGUARDANDO CHAMADA";
+      document.getElementById("patient-message").textContent =
+        "Aguarde sua chamada.";
+      return;
+    }
+
+    const id = String(
+      chamada.id ?? chamada.data ??
+      `${chamada.nome}|${chamada.sala || ""}`
+    );
+
+    if (id === String(ultimaChamadaId)) return;
+
+    ultimaChamadaId = id;
+
+    document.getElementById("patient-nome").textContent =
+      chamada.nome;
+    document.getElementById("local-numero").textContent =
+      chamada.numeroSala || chamada.numero || "➡️";
+    document.getElementById("local-tipo").textContent =
+      chamada.sala || "Sala de Triagem";
+    document.getElementById("patient-message").textContent =
+      `Por favor, dirija-se à ${chamada.sala || "Sala de Triagem"}.`;
+
+    historico.unshift({
+      nome: chamada.nome,
+      sala: chamada.sala || "Sala de Triagem"
+    });
+
+    historico = historico.slice(0, 4);
+
+    const lista = document.getElementById("history-list");
+    lista.innerHTML = "";
+
+    historico.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.nome} — ${item.sala}`;
+      lista.appendChild(li);
+    });
+
+    const painel = document.getElementById("patient-box");
+    painel.classList.remove("flash");
+    void painel.offsetWidth;
+    painel.classList.add("flash");
+
+  } catch (erro) {
+    console.error("Erro ao buscar chamada:", erro);
+  }
+}
+
+atualizar();
+setInterval(atualizar, 2000);
+</script>
+<script src="admin-shortcut.js"></script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema Hospitalar</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #eaf3ff, #f5f8fc, #dce9f7);
+            color: #26374a;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 950px;
+            min-height: 540px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(36, 76, 125, 0.15);
+        }
+
+        .welcome-panel {
+            background: linear-gradient(145deg, #123d70, #1768a8, #328dc1);
+            color: white;
+            padding: 45px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-panel::before,
+        .welcome-panel::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.07);
+            pointer-events: none;
+        }
+
+        .welcome-panel::before {
+            width: 280px;
+            height: 280px;
+            top: -100px;
+            right: -100px;
+        }
+
+        .welcome-panel::after {
+            width: 220px;
+            height: 220px;
+            bottom: -100px;
+            left: -80px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 55px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-icon {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.16);
+            font-size: 30px;
+        }
+
+        .brand-name {
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 7px 13px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 22px;
+        }
+
+        .welcome-content h1 {
+            font-size: 36px;
+            line-height: 1.2;
+            margin-bottom: 18px;
+        }
+
+        .welcome-content p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #e0efff;
+            max-width: 340px;
+        }
+
+        .welcome-footer {
+            margin-top: 55px;
+            font-size: 12px;
+            color: #d0e5fa;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-panel {
+            padding: 55px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            margin-bottom: 32px;
+        }
+
+        .subtitle {
+            color: #3681bd;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .form-header h2 {
+            color: #183653;
+            font-size: 29px;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #7b8b9c;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-bottom: 21px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #344b63;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 9px;
+        }
+
+        .input-box {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 17px;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px 14px 44px;
+            border: 1px solid #dbe5ef;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #26374a;
+            font-size: 14px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        input::placeholder {
+            color: #a0adbb;
+        }
+
+        input:focus {
+            background: #fff;
+            border-color: #3286c5;
+            box-shadow: 0 0 0 4px rgba(50, 134, 197, 0.12);
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 5px;
+            background: linear-gradient(100deg, #1768a8, #328dc1);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 7px 16px rgba(32, 111, 171, 0.2);
+            transition: 0.25s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(32, 111, 171, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: wait;
+            transform: none;
+        }
+
+        #mensagem {
+            display: none;
+            padding: 12px;
+            margin-top: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        #mensagem.erro {
+            display: block;
+            color: #a52834;
+            background: #fff0f1;
+            border: 1px solid #f5c7cb;
+        }
+
+        .security-note {
+            margin-top: 27px;
+            color: #8998a8;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 16px;
+            }
+
+            .login-wrapper {
+                max-width: 430px;
+                grid-template-columns: 1fr;
+                min-height: auto;
+                border-radius: 20px;
+            }
+
+            .welcome-panel {
+                padding: 28px;
+            }
+
+            .brand {
+                margin-bottom: 25px;
+            }
+
+            .welcome-content h1 {
+                font-size: 27px;
+            }
+
+            .welcome-content p {
+                font-size: 13px;
+            }
+
+            .welcome-footer {
+                margin-top: 25px;
+            }
+
+            .form-panel {
+                padding: 35px 28px;
+            }
+
+            .form-header h2 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="login-wrapper">
+
+        <section class="welcome-panel">
+
+            <div class="brand">
+                <div class="brand-icon">✚</div>
+                <div class="brand-name">Sistema Hospitalar</div>
+            </div>
+
+            <div class="welcome-content">
+
+                <span class="tag">GESTÃO EM SAÚDE</span>
+
+                <h1>Cuidado e organização em um só lugar.</h1>
+
+                <p>
+                    Uma plataforma para facilitar os atendimentos,
+                    organizar as triagens e apoiar os profissionais
+                    na rotina hospitalar.
+                </p>
+
+            </div>
+
+            <div class="welcome-footer">
+                Sistema de gerenciamento hospitalar
+            </div>
+
+        </section>
+
+        <section class="form-panel">
+
+            <div class="form-header">
+
+                <div class="subtitle">Acesso ao sistema</div>
+
+                <h2>Bem-vindo(a)!</h2>
+
+                <p>Entre com seus dados para continuar.</p>
+
+            </div>
+
+            <form id="formLogin">
+
+                <div class="input-group">
+
+                    <label for="usuario">Usuário</label>
+
+                    <div class="input-box">
+
+                        <span class="input-icon">👤</span>
+
+                        <input
+                            id="usuario"
+                            name="usuario"
+                            type="text"
+                            placeholder="Digite seu usuário"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="input-group">
+
+                    <label for="senha">Senha</label>
+
+                    <div class="input-box">
+
+                        <span class="input-icon">🔒</span>
+
+                        <input
+                            id="senha"
+                            name="senha"
+                            type="password"
+                            placeholder="Digite sua senha"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <button id="btnEntrar" type="submit">
+                    Entrar no sistema →
+                </button>
+
+                <div id="mensagem" role="alert" aria-live="polite"></div>
+
+            </form>
+
+            <div class="security-note">
+                🔐 Acesso destinado à equipe hospitalar
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+
+        // ELEMENTOS DO FORMULÁRIO
+
+        const formLogin = document.getElementById("formLogin");
+        const campoUsuario = document.getElementById("usuario");
+        const campoSenha = document.getElementById("senha");
+        const botaoEntrar = document.getElementById("btnEntrar");
+        const mensagem = document.getElementById("mensagem");
+
+        // ENDEREÇO DO SERVIDOR
+        // Local: porta 3000
+        // Hospedado: mesma origem do site
+
+        const API_URL = window.location.hostname === "localhost" ||
+                        window.location.hostname === "127.0.0.1"
+            ? "http://localhost:3000"
+            : window.location.origin;
+
+        // LOGIN
+
+        formLogin.addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            mensagem.className = "";
+            mensagem.textContent = "";
+
+            botaoEntrar.disabled = true;
+            botaoEntrar.textContent = "Verificando acesso...";
+
+            try {
+
+                // ENVIA OS DADOS PARA O SERVIDOR
+
+                const resposta = await fetch(`${API_URL}/login`, {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        usuario: campoUsuario.value.trim(),
+                        senha: campoSenha.value
+
+                    })
+
+                });
+
+                // LÊ A RESPOSTA UMA ÚNICA VEZ
+
+                let data;
+
+                try {
+
+                    data = await resposta.json();
+
+                } catch (erro) {
+
+                    throw new Error(
+                        "O servidor retornou uma resposta inválida. Confira a rota /login."
+                    );
+
+                }
+
+                // VERIFICA ERROS DE LOGIN
+
+                if (!resposta.ok) {
+
+                    throw new Error(
+                        data.erro || "Não foi possível realizar o login."
+                    );
+
+                }
+
+                // IDENTIFICA O USUÁRIO
+
+                const usuarioLogado = data.usuario || data;
+
+                if (!usuarioLogado.tipo) {
+
+                    throw new Error(
+                        "O usuário não possui um tipo cadastrado."
+                    );
+
+                }
+
+                // REDIRECIONAMENTO POR TIPO
+
+                const paginas = {
+                    triagem: "triagem.html",
+                    medico: "medico.html",
+                    atendimento: "atendimento.html",
+                    almoxarifado: "almoxarifado.html",
+                    admin: "admin.html"
+                };
+
+                const destino = paginas[usuarioLogado.tipo];
+
+                if (!destino) {
+
+                    throw new Error(
+                        "Tipo de usuário não reconhecido: " +
+                        usuarioLogado.tipo
+                    );
+
+                }
+
+                // LOGIN CONCLUÍDO
+                if (!data.token) {
+                    throw new Error("O servidor não criou uma sessão autenticada.");
+                }
+
+                sessionStorage.setItem("hospitalar_token", data.token);
+                sessionStorage.setItem(
+                    "hospitalar_user",
+                    JSON.stringify(usuarioLogado)
+                );
+
+                window.location.href = destino;
+
+            } catch (erro) {
+
+                console.error("Erro no login:", erro);
+
+                mensagem.textContent =
+                    erro.message === "Failed to fetch"
+                        ? "Não foi possível conectar ao servidor. Confira se o Node.js está iniciado na porta 3000."
+                        : erro.message;
+
+                mensagem.className = "erro";
+
+            } finally {
+
+                botaoEntrar.disabled = false;
+                botaoEntrar.textContent = "Entrar no sistema →";
+
+            }
+
+        });
+
+    </script>
+
+<script src="admin-shortcut.js"></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Medicações Prescritas</title>
+<style>
+  /* --- CSS INTEGRADO PARA MEDICAÇÕES --- */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background-color: #f0f4f8;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-top: 5px solid #0056b3;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  h2 {
+    color: #0056b3;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  /* --- CARDS DE LISTAGEM --- */
+  .card {
+    background: #f8fafc;
+    border-left: 5px solid #0056b3;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    border: 1px solid #e2e8f0;
+    border-left-width: 5px;
+  }
+
+  .card h3 {
+    text-align: left;
+    font-size: 18px;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .card p b {
+    color: #334155;
+  }
+
+  .card:last-child {
+    margin-bottom: 0;
+  }
+
+  p {
+    text-align: center;
+    color: #64748b;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>💊 Medicações Prescritas</h2>
+
+  <!-- IMPLEMENTADO: local onde a lista de medicações será exibida -->
+  <div id="listaMedicacoes"></div>
+
+</div>
+
+<script>
+
+// IMPLEMENTADO: busca as consultas salvas e mostra as medicações
+function carregarMedicacoesPrescritas() {
+  fetch("/medicacoes")
+    .then(r => r.json())
+    .then(data => {
+      const div = document.getElementById("listaMedicacoes");
+
+      div.innerHTML = "";
+
+      if (data.length === 0) {
+        div.innerHTML = "<p>Nenhuma medicação prescrita.</p>";
+        return;
+      }
+
+      data.forEach(c => {
+        div.innerHTML += `
+          <div class="card">
+            <h3>${c.paciente}</h3>
+
+            <p>
+              <b>Medicação:</b>
+              ${c.medicacao}
+            </p>
+
+            <p>
+              <b>Diagnóstico:</b>
+              ${c.diagnostico}
+            </p>
+
+            <p>
+              <b>Observações:</b>
+              ${c.obs || "Nenhuma"}
+            </p>
+          </div>
+        `;
+      });
+    });
+}
+
+carregarMedicacoesPrescritas();
+
+</script>
+
+<script src="admin-shortcut.js"></script>
+</body>
+</html>

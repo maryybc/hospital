@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel Médico</title>
+<style>
+  /* --- CSS INTEGRADO PARA PAINEL MÉDICO --- */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background-color: #f0f4f8;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-top: 5px solid #0056b3;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  h2, h3 {
+    color: #0056b3;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+
+  h3 {
+    font-size: 18px;
+    text-align: left;
+    margin-top: 10px;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #e1e8ed;
+    margin: 10px 0;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #f8fafc;
+    color: #334155;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
+    background-color: #fff;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  input[readonly] {
+    background-color: #e2e8f0;
+    color: #64748b;
+    cursor: not-allowed;
+  }
+
+  button {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+
+  button:hover {
+    background-color: #004085;
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  /* --- CARDS DE TRIAGEM --- */
+  .card {
+    background: #f8fafc;
+    border-left: 5px solid #0056b3;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    border: 1px solid #e2e8f0;
+    border-left-width: 5px;
+  }
+
+  .card h3 {
+    text-align: left;
+    font-size: 18px;
+    color: #1e293b;
+    margin-bottom: 8px;
+    margin-top: 0;
+  }
+
+  .card p {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 5px;
+  }
+
+  .card button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    width: auto;
+  }
+
+  /* --- CORES DE RISCO --- */
+  .vermelho {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+  }
+
+  .amarelo {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+  }
+
+  .verde {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+  }
+
+  .top-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .top-actions button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .status-message {
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .status-message.warning {
+    color: #92400e;
+    background: #fef3c7;
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  .history-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #0056b3;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="top-actions">
+    <button type="button" onclick="sair()">Sair</button>
+  </div>
+
+  <h2>🩺 Painel Médico</h2>
+
+  <div id="triagens"></div>
+  <p id="mensagem" class="status-message" role="status" aria-live="polite"></p>
+
+  <hr>
+
+  <h3>Consulta</h3>
+
+  <input id="paciente" placeholder="Paciente" readonly>
+
+  <input id="diagnostico" placeholder="Diagnóstico">
+
+  <input id="buscaMedicacao" placeholder="Pesquisar medicamento pelo nome"
+    oninput="filtrarMedicacoes()" autocomplete="off">
+
+  <select id="medicacao" onchange="atualizarDisponibilidade()">
+    <option value="">Selecione a medicação</option>
+  </select>
+
+  <p id="disponibilidade" class="status-message" aria-live="polite"></p>
+
+  <label for="quantidade">Quantidade prescrita</label>
+  <input id="quantidade" type="number" min="1" step="1" value="1"
+    oninput="atualizarDisponibilidade()">
+
+  <label for="dosagem">Dosagem</label>
+  <input id="dosagem" placeholder="Ex.: 1 comprimido">
+
+  <label for="frequencia">Frequência</label>
+  <input id="frequencia" placeholder="Ex.: a cada 8 horas">
+
+  <label for="duracao">Duração do tratamento</label>
+  <input id="duracao" placeholder="Ex.: 5 dias">
+
+  <textarea id="obs" placeholder="Observações"></textarea>
+
+  <button onclick="salvar()">Registrar prescrição</button>
+
+  <hr>
+  <h3>Histórico de prescrições</h3>
+  <div id="historicoPrescricoes" class="status-message"></div>
+
+</div>
+
+<script>
+
+let triagensCarregadas = [];
+let medicamentosCarregados = [];
+const token = sessionStorage.getItem("hospitalar_token");
+const usuario = JSON.parse(sessionStorage.getItem("hospitalar_user") || "{}");
+
+if (!token || usuario.tipo !== "medico") {
+  window.location.replace("index.html");
+}
+
+function escaparHTML(valor) {
+  return String(valor ?? "").replace(/[&<>"']/g, caractere => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[caractere]);
+}
+
+async function requisicao(url, opcoes = {}) {
+  const headers = new Headers(opcoes.headers || {});
+  headers.set("Authorization", `Bearer ${token}`);
+  if (opcoes.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const resposta = await fetch(url, { ...opcoes, headers });
+  const texto = await resposta.text();
+  let data;
+  try {
+    data = texto ? JSON.parse(texto) : {};
+  } catch {
+    throw new Error("O servidor retornou uma resposta inválida.");
+  }
+
+  if (resposta.status === 401) {
+    sessionStorage.removeItem("hospitalar_token");
+    sessionStorage.removeItem("hospitalar_user");
+    window.location.replace("index.html");
+  }
+  if (!resposta.ok) {
+    throw new Error(data.erro || `Erro HTTP ${resposta.status}`);
+  }
+  return data;
+}
+
+function informar(mensagem, aviso = false) {
+  const elemento = document.getElementById("mensagem");
+  elemento.textContent = mensagem;
+  elemento.className = `status-message${aviso ? " warning" : ""}`;
+}
+
+async function sair() {
+  try {
+    await requisicao("/logout", { method: "POST" });
+  } catch (erro) {
+    console.error("Erro ao encerrar sessão:", erro);
+  } finally {
+    sessionStorage.removeItem("hospitalar_token");
+    sessionStorage.removeItem("hospitalar_user");
+    window.location.replace("index.html");
+  }
+}
+
+async function carregar() {
+  try {
+    triagensCarregadas = await requisicao("/triagens");
+    const div = document.getElementById("triagens");
+    div.innerHTML = triagensCarregadas.map((t, index) => `
+      <div class="card">
+        <h3>${escaparHTML(t.nome)}</h3>
+        <p><b>Sintoma:</b> ${escaparHTML(t.sintoma || t.sintomas || "Não informado")}</p>
+        <p><b>Temperatura:</b> ${escaparHTML(t.temperatura || t.temp || "Não informada")}°C</p>
+        <p><b>Risco:</b> <span class="${escaparHTML(t.risco || "verde")}">${escaparHTML(t.risco || "Não informado")}</span></p>
+        <p><b>Alergia:</b> ${escaparHTML(t.alergia || "Nenhuma")}</p>
+        <p><b>Observação:</b> ${escaparHTML(t.observacao || "Nenhuma")}</p>
+        <button onclick="selecionar(${index})">Atender</button>
+      </div>
+    `).join("");
+    if (triagensCarregadas.length === 0) {
+      div.innerHTML = '<p class="status-message">Nenhuma triagem aguardando atendimento.</p>';
+    }
+    informar("");
+  } catch (erro) {
+    informar(`Erro ao carregar triagens: ${erro.message}`, true);
+  }
+}
+
+function selecionar(index) {
+  const t = triagensCarregadas[index];
+  if (!t) return;
+
+  document.getElementById("paciente").value = t.nome;
+  document.getElementById("obs").value = t.observacao || "";
+
+  if (t.alergia && t.alergia !== "Nenhuma") {
+    alert("⚠️ Paciente possui alergia: " + t.alergia);
+  }
+}
+
+async function carregarMedicacoes() {
+  try {
+    const selecionado = document.getElementById("medicacao").value;
+    medicamentosCarregados = await requisicao("/estoque");
+    filtrarMedicacoes(selecionado);
+  } catch (erro) {
+    informar(`Erro ao carregar medicamentos do almoxarifado: ${erro.message}`, true);
+  }
+}
+
+function filtrarMedicacoes(selecionadoAtual = document.getElementById("medicacao").value) {
+  const busca = document.getElementById("buscaMedicacao").value.trim().toLocaleLowerCase("pt-BR");
+  const select = document.getElementById("medicacao");
+  select.innerHTML = '<option value="">Selecione a medicação</option>';
+
+  medicamentosCarregados
+    .filter(med => med.nome.toLocaleLowerCase("pt-BR").includes(busca))
+    .forEach(med => {
+      const option = document.createElement("option");
+      option.value = med.id;
+      option.disabled = !med.disponivel;
+      option.textContent = med.ativo === false
+        ? `${med.nome} — arquivado`
+        : med.disponivel
+          ? `${med.nome} — ${med.quantidade} ${med.unidade} disponível(is)`
+          : `${med.nome} — indisponível (estoque zero ou vencido)`;
+      select.appendChild(option);
+    });
+
+  if (medicamentosCarregados.some(med => String(med.id) === selecionadoAtual)) {
+    select.value = selecionadoAtual;
+  }
+  atualizarDisponibilidade();
+}
+
+function atualizarDisponibilidade() {
+  const id = document.getElementById("medicacao").value;
+  const medicamento = medicamentosCarregados.find(item => String(item.id) === id);
+  const elemento = document.getElementById("disponibilidade");
+  if (!medicamento) {
+    elemento.textContent = "";
+    elemento.className = "status-message";
+    return;
+  }
+
+  const quantidade = Number(document.getElementById("quantidade").value);
+  if (!medicamento.disponivel) {
+    elemento.textContent = "Indisponível para prescrição: sem estoque válido.";
+    elemento.className = "status-message warning";
+  } else if (Number.isInteger(quantidade) && quantidade > medicamento.quantidade) {
+    elemento.textContent = `Estoque insuficiente para dispensar: há ${medicamento.quantidade} ${medicamento.unidade}. A prescrição não fará baixa.`;
+    elemento.className = "status-message warning";
+  } else {
+    elemento.textContent = `Disponível: ${medicamento.quantidade} ${medicamento.unidade}. A prescrição não altera o estoque.`;
+    elemento.className = "status-message";
+  }
+}
+
+async function carregarHistorico() {
+  try {
+    const prescricoes = await requisicao("/medicacoes");
+    const div = document.getElementById("historicoPrescricoes");
+    div.innerHTML = prescricoes.length
+      ? prescricoes.map(p => `
+        <div class="history-card">
+          <strong>${escaparHTML(p.paciente)}</strong><br>
+          <b>Medicamento:</b> ${escaparHTML(p.medicacao || "Não informado")}
+          — ${escaparHTML(p.quantidade ?? "-")} ${escaparHTML(p.unidade || "")}<br>
+          <b>Dosagem:</b> ${escaparHTML(p.dosagem || "-")} |
+          <b>Frequência:</b> ${escaparHTML(p.frequencia || "-")} |
+          <b>Duração:</b> ${escaparHTML(p.duracao || "-")}<br>
+          <b>Prescritor:</b> ${escaparHTML(p.responsavel || "Não informado")} |
+          ${escaparHTML(p.createdAt ? new Date(p.createdAt).toLocaleString("pt-BR") : "")}
+          ${p.estoqueInsuficiente ? "<br><strong>Estoque insuficiente para a quantidade prescrita.</strong>" : ""}
+        </div>
+      `).join("")
+      : "Nenhuma prescrição registrada.";
+  } catch (erro) {
+    informar(`Erro ao carregar histórico: ${erro.message}`, true);
+  }
+}
+
+async function salvar() {
+  const paciente = document.getElementById("paciente").value;
+  const diagnostico = document.getElementById("diagnostico").value;
+  const medicamentoId = document.getElementById("medicacao").value;
+  const quantidade = Number(document.getElementById("quantidade").value);
+  const dosagem = document.getElementById("dosagem").value.trim();
+  const frequencia = document.getElementById("frequencia").value.trim();
+  const duracao = document.getElementById("duracao").value.trim();
+  const obs = document.getElementById("obs").value;
+
+  if (!paciente) {
+    alert("Selecione um paciente clicando em Atender.");
+    return;
+  }
+
+  if (!medicamentoId) {
+    alert("Selecione uma medicação.");
+    return;
+  }
+
+  if (!Number.isSafeInteger(quantidade) || quantidade <= 0) {
+    alert("Informe uma quantidade inteira maior que zero.");
+    return;
+  }
+
+  if (!dosagem || !frequencia || !duracao) {
+    alert("Informe a dosagem, a frequência e a duração do tratamento.");
+    return;
+  }
+
+  const medicamento = medicamentosCarregados.find(item => String(item.id) === medicamentoId);
+  if (!medicamento || !medicamento.disponivel) {
+    alert("O medicamento está indisponível no estoque. Atualize a lista antes de prescrever.");
+    await carregarMedicacoes();
+    return;
+  }
+  if (quantidade > medicamento.quantidade &&
+      !confirm(`O estoque disponível é ${medicamento.quantidade} ${medicamento.unidade}, abaixo da quantidade prescrita. Registrar mesmo assim?`)) {
+    return;
+  }
+
+  try {
+    await requisicao("/consulta", {
+      method: "POST",
+      body: JSON.stringify({
+      paciente,
+      diagnostico,
+      medicamentoId,
+      quantidade,
+      dosagem,
+      frequencia,
+      duracao,
+      obs
+      })
+    });
+
+    alert("Consulta salva");
+
+    document.getElementById("diagnostico").value = "";
+    document.getElementById("medicacao").value = "";
+    document.getElementById("quantidade").value = "1";
+    document.getElementById("dosagem").value = "";
+    document.getElementById("frequencia").value = "";
+    document.getElementById("duracao").value = "";
+    document.getElementById("obs").value = "";
+    document.getElementById("paciente").value = "";
+    await carregarMedicacoes();
+    await carregarHistorico();
+  } catch (erro) {
+    alert(`Erro ao registrar prescrição: ${erro.message}`);
+  }
+}
+
+carregar();
+carregarMedicacoes();
+carregarHistorico();
+setInterval(carregarMedicacoes, 5000);
+setInterval(carregarHistorico, 10000);
+
+</script>
+
+<script src="admin-shortcut.js"></script>
+</body>
+</html>

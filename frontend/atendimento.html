@@ -1,0 +1,338 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atendimento - Sistema Hospitalar</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #eaf3ff, #f5f8fc, #dce9f7);
+    color: #26374a;
+}
+
+.container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    padding: 38px 35px;
+    border-radius: 20px;
+    border-top: 6px solid #1768a8;
+    box-shadow: 0 15px 40px rgba(36, 76, 125, 0.12);
+}
+
+.cabecalho {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.icone {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: #eaf3ff;
+    color: #1768a8;
+    font-size: 32px;
+}
+
+h1 {
+    color: #183653;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.subtitulo {
+    color: #7b8b9c;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.linha {
+    height: 1px;
+    background: #e8eef5;
+    margin-bottom: 25px;
+}
+
+.grupo {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    color: #344b63;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="file"],
+select {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #dbe5ef;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.25s;
+    background: #f8fafc;
+    color: #26374a;
+}
+
+input::placeholder {
+    color: #a0adbb;
+}
+
+input[type="file"] {
+    padding: 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+input:focus,
+select:focus {
+    border-color: #3286c5;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(50, 134, 197, 0.12);
+}
+
+select {
+    cursor: pointer;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(100deg, #1768a8, #328dc1);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 7px 16px rgba(32, 111, 171, 0.2);
+    transition: 0.25s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(32, 111, 171, 0.3);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+#mensagem {
+    display: none;
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 9px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+#mensagem.sucesso {
+    display: block;
+    color: #17603a;
+    background: #eaf8ef;
+    border: 1px solid #bde6ca;
+}
+
+#mensagem.erro {
+    display: block;
+    color: #a52834;
+    background: #fff0f1;
+    border: 1px solid #f5c7cb;
+}
+
+.rodape {
+    text-align: center;
+    margin-top: 23px;
+    color: #8998a8;
+    font-size: 12px;
+}
+
+@media (max-width: 500px) {
+    body {
+        padding: 16px;
+    }
+
+    .container {
+        padding: 28px 22px;
+        border-radius: 16px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="cabecalho">
+        <div class="icone">✚</div>
+        <h1>Atendimento</h1>
+        <p class="subtitulo">
+            Cadastre o paciente para iniciar o atendimento hospitalar.
+        </p>
+    </header>
+
+    <div class="linha"></div>
+
+    <form id="formAtendimento">
+
+        <div class="grupo">
+            <label for="nome">Nome completo</label>
+            <input
+                type="text"
+                id="nome"
+                placeholder="Digite o nome do paciente"
+                required
+            >
+        </div>
+
+        <div class="grupo">
+            <label for="cpf">CPF ou documento</label>
+            <input
+                type="text"
+                id="cpf"
+                placeholder="Digite o CPF ou documento"
+                required
+            >
+        </div>
+
+        <div class="grupo">
+            <label for="tipo">Tipo de atendimento</label>
+            <select id="tipo" required>
+                <option value="Convenio">Convênio</option>
+                <option value="Particular">Particular</option>
+            </select>
+        </div>
+
+        <div class="grupo">
+            <label for="foto">Foto do paciente (opcional)</label>
+            <input
+                type="file"
+                id="foto"
+                accept="image/*"
+            >
+        </div>
+
+        <button type="submit" id="btnCadastrar">
+            Cadastrar paciente →
+        </button>
+
+        <div id="mensagem" role="alert"></div>
+
+    </form>
+
+    <div class="rodape">
+        Sistema Hospitalar · Gestão em Saúde
+    </div>
+
+</div>
+
+<script>
+const formAtendimento = document.getElementById("formAtendimento");
+const mensagem = document.getElementById("mensagem");
+const botao = document.getElementById("btnCadastrar");
+
+formAtendimento.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    mensagem.className = "";
+    mensagem.textContent = "";
+
+    botao.disabled = true;
+    botao.textContent = "Cadastrando...";
+
+    try {
+        const resposta = await fetch(
+            `${window.location.origin}/atendimento`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nome: document.getElementById("nome").value.trim(),
+                    cpf: document.getElementById("cpf").value.trim(),
+                    tipo: document.getElementById("tipo").value
+                })
+            }
+        );
+
+        const texto = await resposta.text();
+        let data = {};
+
+        if (texto.trim()) {
+            try {
+                data = JSON.parse(texto);
+            } catch {
+                throw new Error(
+                    "O servidor retornou uma resposta inválida."
+                );
+            }
+        }
+
+        if (!resposta.ok) {
+            throw new Error(
+                data.erro || "Não foi possível cadastrar o paciente."
+            );
+        }
+
+        mensagem.textContent =
+            data.mensagem || "Paciente cadastrado com sucesso!";
+        mensagem.className = "sucesso";
+
+        formAtendimento.reset();
+
+    } catch (erro) {
+        console.error("Erro no cadastro:", erro);
+
+        mensagem.textContent =
+            erro.message === "Failed to fetch"
+                ? "Não foi possível conectar ao servidor. Verifique se ele está funcionando."
+                : erro.message;
+
+        mensagem.className = "erro";
+
+    } finally {
+        botao.disabled = false;
+        botao.textContent = "Cadastrar paciente →";
+    }
+});
+</script>
+
+<script src="admin-shortcut.js"></script>
+</body>
+</html>
