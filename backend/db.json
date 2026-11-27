@@ -26,10 +26,9 @@
     },
     {
       "usuario": "admin",
-      "tipo": "admin",
-      "senhaSalt": "3fbea5eb6f89e42759a9c59b7acbf82d",
-      "senhaHash": "0be94ba06f858089abba4d9f017c4775761fc77eb6de39ba7384277b87d61b420061e50d0c4e07b0a057ecd59718ff8496cb064f2a005ac3177e146248b198a5",
-      "createdAt": "2026-11-26T15:23:05.133Z"
+      "senha": "123",
+      "tipo": "admin"
+      
     }
   ],
   "pacientes": [
